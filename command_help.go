@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"sort"
+
+	"github.com/svlaer/pokedexcli/internal/pokeapi"
 )
 
-func commandHelp() error {
+func commandHelp(config *pokeapi.Config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -22,7 +24,7 @@ func commandHelp() error {
 
 	for _, e := range keySlice {
 		cmd := cmds[e]
-		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
+		fmt.Printf("%s: \n\t%s\n\n", cmd.name, cmd.description)
 	}
 
 	fmt.Println()

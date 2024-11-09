@@ -1,8 +1,12 @@
 package main
 
-import "os"
+import (
+	"os"
 
-func commandExit() error {
+	"github.com/svlaer/pokedexcli/internal/pokeapi"
+)
+
+func commandExit(config *pokeapi.Config) error {
 	os.Exit(0)
 	return nil
 }
