@@ -9,8 +9,13 @@ import (
 	"github.com/svlaer/pokedexcli/internal/pokeapi"
 )
 
-func startRepl() {
-	conf := pokeapi.InitialConfig()
+type config struct {
+	pokeapiClient    pokeapi.Client
+	nextLocationsURL *string
+	prevLocationsURL *string
+}
+
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 
@@ -27,7 +32,7 @@ func startRepl() {
 		command, prs := commands()[commandName]
 
 		if prs {
-			err := command.callback(&conf)
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -52,7 +57,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Config) error
+	callback    func(*config) error
 }
 
 func commands() map[string]cliCommand {

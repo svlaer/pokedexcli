@@ -2,26 +2,42 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/svlaer/pokedexcli/internal/pokeapi"
+	"os"
 )
 
-func commandMap(config *pokeapi.Config) error {
-	url := config.Next
-
-	la, err := pokeapi.GetMap(url)
+func commandMap(cfg *config) error {
+	respLA, err := cfg.pokeapiClient.GetLocationAreas(cfg.nextLocationsURL)
 	if err != nil {
 		return err
 	}
 
-	config.Next = la.Next
-	if la.Previous == nil {
-		config.Previous = ""
-	} else {
-		config.Previous = *la.Previous
+	cfg.nextLocationsURL = respLA.Next
+	cfg.prevLocationsURL = respLA.Previous
+
+	for _, result := range respLA.Results {
+		fmt.Println(result.Name)
+	}
+	fmt.Println()
+
+	return nil
+}
+
+func commandMapb(cfg *config) error {
+	if cfg.prevLocationsURL == nil {
+		fmt.Fprintln(os.Stderr, "First page! Can't map back.")
+		fmt.Println()
+		return nil
 	}
 
-	for _, result := range la.Results {
+	respLA, err := cfg.pokeapiClient.GetLocationAreas(cfg.prevLocationsURL)
+	if err != nil {
+		return err
+	}
+
+	cfg.nextLocationsURL = respLA.Next
+	cfg.prevLocationsURL = respLA.Previous
+
+	for _, result := range respLA.Results {
 		fmt.Println(result.Name)
 	}
 	fmt.Println()

@@ -3,11 +3,9 @@ package main
 import (
 	"fmt"
 	"sort"
-
-	"github.com/svlaer/pokedexcli/internal/pokeapi"
 )
 
-func commandHelp(config *pokeapi.Config) error {
+func commandHelp(cfg *config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
