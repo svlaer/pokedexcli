@@ -3,6 +3,7 @@ package pokeapi
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -12,25 +13,36 @@ func (c *Client) GetLocationAreas(pageURL *string) (RespLocationAreas, error) {
 		url = *pageURL
 	}
 
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return RespLocationAreas{}, fmt.Errorf("Failed to build request for \"GetLocationAreas\"! -> %w", err)
-	}
+	data, cacheHit := c.cache.Get(url)
+	if !cacheHit {
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return RespLocationAreas{}, fmt.Errorf("Failed to build request for \"GetLocationAreas\"! -> %w", err)
+		}
 
-	res, err := c.httpClient.Do(req)
-	if err != nil {
-		return RespLocationAreas{}, fmt.Errorf("Failed to perform request for \"GetLocationAreas\"! -> %w", err)
-	}
-	defer res.Body.Close()
+		res, err := c.httpClient.Do(req)
+		if err != nil {
+			return RespLocationAreas{}, fmt.Errorf("Failed to perform request for \"GetLocationAreas\"! -> %w", err)
+		}
+		defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return RespLocationAreas{}, fmt.Errorf("Failed to get Location Areas! Status code: %s -- (URL: %s)", res.Status, url)
+		if res.StatusCode != http.StatusOK {
+			return RespLocationAreas{}, fmt.Errorf("Failed to get Location Areas! Status code: %s -- (URL: %s)", res.Status, url)
+		}
+
+		bodyData, err := io.ReadAll(res.Body)
+		if err != nil {
+			return RespLocationAreas{}, fmt.Errorf("Failed to read response body! -> %w", err)
+		}
+
+		data = bodyData
+		c.cache.Add(url, data)
 	}
 
 	var respLA RespLocationAreas
-	decoder := json.NewDecoder(res.Body)
-	if err := decoder.Decode(&respLA); err != nil {
-		return RespLocationAreas{}, fmt.Errorf("Failed to decode Location Areas! -> %w", err)
+	err := json.Unmarshal(data, &respLA)
+	if err != nil {
+		return RespLocationAreas{}, fmt.Errorf("Failed to unmarshall Location Areas! -> %w", err)
 	}
 
 	return respLA, nil
