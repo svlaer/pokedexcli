@@ -28,13 +28,15 @@ func startRepl(cfg *config) {
 		}
 
 		commandName := words[0]
+		args := words[1:]
 
 		command, prs := commands()[commandName]
 
 		if prs {
-			err := command.callback(cfg)
+			err := command.callback(cfg, args...)
 			if err != nil {
 				fmt.Println(err)
+				fmt.Println()
 			}
 		} else {
 			fmt.Fprintln(os.Stderr, "Unrecognized command: ", commandName)
@@ -44,6 +46,7 @@ func startRepl(cfg *config) {
 
 		if err := scanner.Err(); err != nil {
 			fmt.Fprintln(os.Stderr, "Reading standard input: ", err)
+			fmt.Println()
 		}
 	}
 }
@@ -57,19 +60,19 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, ...string) error
 }
 
 func commands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
-			description: "Displays a help message",
+			description: "Displays a help message.",
 			callback:    commandHelp,
 		},
 		"exit": {
 			name:        "exit",
-			description: "Exit the Pokedex",
+			description: "Exit the Pokedex.",
 			callback:    commandExit,
 		},
 		"map": {
@@ -81,6 +84,11 @@ func commands() map[string]cliCommand {
 			name:        "mapb",
 			description: "(Map back) Like the \"map\" command. Displays the previous 20 locations.",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Usage: \"explore <location-area-name>\" -- Displays a list of all Pokemon in a given area.",
+			callback:    commandExplore,
 		},
 	}
 }

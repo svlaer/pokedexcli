@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// TODO: Refactor (see GetLocationArea)
 func (c *Client) GetLocationAreas(pageURL *string) (RespLocationAreas, error) {
 	url := baseURL + "/location-area/"
 	if pageURL != nil {
@@ -42,7 +43,7 @@ func (c *Client) GetLocationAreas(pageURL *string) (RespLocationAreas, error) {
 	var respLA RespLocationAreas
 	err := json.Unmarshal(data, &respLA)
 	if err != nil {
-		return RespLocationAreas{}, fmt.Errorf("Failed to unmarshall Location Areas! -> %w", err)
+		return RespLocationAreas{}, fmt.Errorf("Failed to unmarshal Location Areas! -> %w", err)
 	}
 
 	return respLA, nil
