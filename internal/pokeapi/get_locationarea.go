@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// TODO: Refactor to general PerformGetWithCaching (or similar) function, also for GetLocationAreas
+// TODO: Refactor to general PerformGetWithCaching (or GetResource or something) function, also for GetLocationAreas and GetPokemon
 func (c *Client) GetLocationArea(locationAreaName string) (RespLocationArea, error) {
 	url := fmt.Sprintf("%s/location-area/%s/", baseURL, locationAreaName)
 
