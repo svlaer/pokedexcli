@@ -34,6 +34,7 @@ func commandCatch(cfg *config, args ...string) error {
 		fmt.Println()
 	} else {
 		fmt.Printf("%s was caught!\n", name)
+		fmt.Println("You may now inspect it with the inspect command.")
 		fmt.Println()
 
 		pokestats := make(map[string]int)
